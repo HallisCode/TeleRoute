@@ -5,12 +5,12 @@ namespace TelegramBotClientExtended.Routing
 {
     public record TelegramRoute : ITelegramRoute
     {
-        public UpdateType? AllowedTypes { get; init; }
+        public UpdateType? AllowedType { get; init; }
         public ITelegramFilter? Filter { get; init; }
 
         public TelegramRoute(UpdateType allowedTypes, ITelegramFilter? filter = null)
         {
-            AllowedTypes = allowedTypes;
+            AllowedType = allowedTypes;
             Filter = filter;
         }
         

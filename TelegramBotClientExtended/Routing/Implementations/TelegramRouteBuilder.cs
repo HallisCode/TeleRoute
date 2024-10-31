@@ -67,7 +67,7 @@ namespace TelegramBotClientExtended.Routing
                     Attribute.GetCustomAttribute(classType, typeof(TelegramRouteAttribute))!;
 
                 // Проверяем какие условия заданы у класса
-                bool isAllowedTypeDefined = classRouteAttribute.AllowedTypes is not null;
+                bool isAllowedTypeDefined = classRouteAttribute.AllowedType is not null;
                 bool isFilterDefined = classRouteAttribute.Filter is not null;
 
                 bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
@@ -78,7 +78,7 @@ namespace TelegramBotClientExtended.Routing
                 {
                     TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
                         innerBranch: methodsDescriptors,
-                        allowedTypes: classRouteAttribute.AllowedTypes,
+                        allowedTypes: classRouteAttribute.AllowedType,
                         filter: classRouteAttribute.Filter);
 
                     descriptors.Add(routeDescriptor);
@@ -112,7 +112,7 @@ namespace TelegramBotClientExtended.Routing
 
                 TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
                     handler: (TelegramEndpointDelegate)method.CreateDelegate(typeof(TelegramEndpointDelegate)),
-                    allowedTypes: methodRouteAttribute.AllowedTypes,
+                    allowedTypes: methodRouteAttribute.AllowedType,
                     filter: methodRouteAttribute.Filter);
 
                 descriptors.Add(routeDescriptor);

@@ -5,7 +5,7 @@ namespace TelegramBotClientExtended.Routing
 {
     public interface ITelegramRoute
     {
-        UpdateType? AllowedTypes { get; }
+        UpdateType? AllowedType { get; }
 
         ITelegramFilter? Filter { get; }
     }

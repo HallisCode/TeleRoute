@@ -9,7 +9,7 @@ namespace TelegramBotClientExtended.Routing
 {
     public record TelegramRouteDescriptor : ITelegramRouteDescriptor
     {
-        public UpdateType? AllowedTypes { get; init; }
+        public UpdateType? AllowedType { get; init; }
         public ITelegramFilter? Filter { get; init; }
         public TelegramEndpointDelegate? Handler { get; init; }
 
@@ -20,17 +20,11 @@ namespace TelegramBotClientExtended.Routing
         public TelegramRouteDescriptor(
             TelegramEndpointDelegate handler,
             UpdateType? allowedTypes = null,
-            ITelegramFilter? filter = null,
-            IEnumerable<ITelegramRouteDescriptor> innerBranch = null)
+            ITelegramFilter? filter = null)
         {
-            AllowedTypes = allowedTypes;
+            AllowedType = allowedTypes;
             Filter = filter;
             Handler = handler;
-
-            if (innerBranch is not null)
-            {
-                InnerBranch = innerBranch.ToArray();
-            }
         }
 
         public TelegramRouteDescriptor(
@@ -38,9 +32,10 @@ namespace TelegramBotClientExtended.Routing
             UpdateType? allowedTypes = null,
             ITelegramFilter? filter = null)
         {
-            AllowedTypes = allowedTypes;
+            AllowedType = allowedTypes;
             Filter = filter;
             InnerBranch = innerBranch.ToArray();
+            isBranch = true;
         }
 
         public virtual bool Equals(ITelegramRouteDescriptor? other)
@@ -55,7 +50,7 @@ namespace TelegramBotClientExtended.Routing
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(AllowedTypes, Filter);
+            return HashCode.Combine(AllowedType, Filter);
         }
     }
 }
