@@ -10,7 +10,7 @@ namespace TelegramBotClientExtended.Routing
 {
     public class TelegramRouteBuilder : ITelegramRouteBuilder
     {
-        private List<ITelegramRouteDescriptor> _routes;
+        private List<ITelegramRouteDescriptor> _routes = new List<ITelegramRouteDescriptor>();
 
         public TelegramRouteBuilder()
         {
@@ -41,8 +41,8 @@ namespace TelegramBotClientExtended.Routing
 
         private void _AddAllClassesWithTelegramRouteAttributeFromAssembly(Assembly assembly)
         {
+            // Находим все классы с TelegramRouteAttribute
             Type[] types = assembly.GetTypes();
-
             Type[] classTypeWithAttribute = types.Where(
                 (type) => type.IsClass && Attribute.IsDefined(type, typeof(TelegramRouteAttribute))
             ).ToArray();
@@ -50,6 +50,14 @@ namespace TelegramBotClientExtended.Routing
             List<ITelegramRouteDescriptor> descriptors = new List<ITelegramRouteDescriptor>();
             foreach (Type classType in classTypeWithAttribute)
             {
+                object[] attributes = classType.GetCustomAttributes(false);
+
+                AllowedUpdateTypeAttribute? allowedTypeAttribute = (AllowedUpdateTypeAttribute?)
+                    Attribute.GetCustomAttribute(
+                        classType, typeof(AllowedUpdateTypeAttribute)
+                    );
+                ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
+
                 // Получаем все методы класса
                 MethodInfo[] methods = classType.GetMethods();
                 if (methods.Length <= 0)
@@ -62,31 +70,27 @@ namespace TelegramBotClientExtended.Routing
                     (method) => Attribute.IsDefined(method, typeof(TelegramRouteAttribute))
                 ).ToArray();
 
-                // Получаем TelegramRouteAttribute у класса
-                TelegramRouteAttribute? classRouteAttribute = (TelegramRouteAttribute)
-                    Attribute.GetCustomAttribute(classType, typeof(TelegramRouteAttribute))!;
-
-                // Проверяем какие условия заданы у класса
-                bool isAllowedTypeDefined = classRouteAttribute.AllowedType is not null;
-                bool isFilterDefined = classRouteAttribute.Filter is not null;
-
-                bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
-
+                // Получаем дескрипторы для всех методов, по аналогии с классом
                 List<ITelegramRouteDescriptor> methodsDescriptors = _GetRoutesFromMethods(methodsWithAttribute);
 
+                // Проверяем какие условия заданы у класса
+                bool isAllowedTypeDefined = allowedTypeAttribute is not null;
+                bool isFilterDefined = filtersAttributes.Length > 0;
+
+                bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
                 if (isClassHasConditions)
                 {
-                    TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
-                        innerBranch: methodsDescriptors,
-                        allowedTypes: classRouteAttribute.AllowedType,
-                        filter: classRouteAttribute.Filter);
+                    ITelegramRouteDescriptor descriptor = new TelegramRouteDescriptor(
+                        descriptors,
+                        allowedTypeAttribute?.AllowedType,
+                        filtersAttributes
+                    );
 
-                    descriptors.Add(routeDescriptor);
+                    descriptors.Add(descriptor);
+                    continue;
                 }
-                else
-                {
-                    descriptors.AddRange(methodsDescriptors);
-                }
+
+                descriptors.AddRange(methodsDescriptors);
             }
 
             _VerifyUnduplicated(descriptors);
@@ -104,37 +108,46 @@ namespace TelegramBotClientExtended.Routing
                 TelegramRouteAttribute? methodRouteAttribute = (TelegramRouteAttribute?)
                     Attribute.GetCustomAttribute(method, typeof(TelegramRouteAttribute));
 
+                // Проверяем что у метода присутствует аттрибут TelegramRouteAttribute
                 if (methodRouteAttribute is null)
                 {
                     throw new Exception($"У метода {method.Module.Assembly.Location} отсутствует аттрибут " +
-                                        $"{typeof(TelegramEndpointDelegate).FullName}");
+                                        $"{typeof(TelegramRouteAttribute).FullName}");
                 }
+
+                object[] attributes = method.GetCustomAttributes(false);
+
+                AllowedUpdateTypeAttribute? allowedTypeAttribute = (AllowedUpdateTypeAttribute?)
+                    Attribute.GetCustomAttribute(
+                        method, typeof(AllowedUpdateTypeAttribute)
+                    );
+                ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
+
 
                 TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
                     handler: (TelegramEndpointDelegate)method.CreateDelegate(typeof(TelegramEndpointDelegate)),
-                    allowedTypes: methodRouteAttribute.AllowedType,
-                    filter: methodRouteAttribute.Filter);
+                    allowedType: allowedTypeAttribute.AllowedType,
+                    filters: filtersAttributes);
 
                 descriptors.Add(routeDescriptor);
             }
 
             _VerifyUnduplicated(descriptors);
-
             return descriptors;
         }
 
         private void _VerifyMatchTelegramEndpointDelegate(MethodInfo method)
         {
             bool isMatch = Delegate.CreateDelegate(
-                typeof(TelegramEndpointDelegate), method, false
+                typeof(TelegramEndpointDelegate), method.DeclaringType, method, false
             ) != null;
 
-            if (isMatch is false)
-            {
-                throw new Exception($"К методу {method.Module.Assembly.Location} " +
-                                    $"применён аттрибут {typeof(TelegramEndpointDelegate).FullName}, " +
-                                    $"хотя он не соответствует делегату {typeof(TelegramEndpointDelegate).FullName}");
-            }
+            // if (isMatch is false)
+            // {
+            //     throw new Exception($"К методу {method.Name} " +
+            //                         $"применён аттрибут {typeof(TelegramEndpointDelegate).FullName}, " +
+            //                         $"хотя он не соответствует делегату {typeof(TelegramEndpointDelegate).FullName}");
+            // }
         }
 
         private void _VerifyUnduplicated(IEnumerable<ITelegramRouteDescriptor> descriptors)

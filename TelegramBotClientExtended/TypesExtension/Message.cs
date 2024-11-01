@@ -8,12 +8,17 @@ namespace TelegramBotClientExtended.Types
     {
         public static bool IsCommand(this Message? message)
         {
-            if (message is null ||
-                message.Type != MessageType.Text || !message.Text.StartsWith('/')
-               )
+            if (message is null || message.Type != MessageType.Text)
+            {
                 return false;
+            }
 
-            return true;
+            if (message.Text.StartsWith('/'))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static string? GetCommand(this Message? message, out string[]? args)

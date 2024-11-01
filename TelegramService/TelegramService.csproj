@@ -15,8 +15,4 @@
     <ProjectReference Include="..\TelegramBotClientExtended\TelegramBotClientExtended.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TelegramControllers\" />
-  </ItemGroup>
-
 </Project>
