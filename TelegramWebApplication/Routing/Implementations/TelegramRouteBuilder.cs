@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Telegram.Bot.Types.Enums;
-using TelegramBotClientExtended.Routing.Attributes;
-using TelegramBotClientExtended.Routing.Filters;
+using TelegramWebApplication.Routing.Attributes;
+using TelegramWebApplication.Routing.Filters;
 
-namespace TelegramBotClientExtended.Routing
+namespace TelegramWebApplication.Routing
 {
     public class TelegramRouteBuilder : ITelegramRouteBuilder
     {
@@ -125,7 +125,8 @@ namespace TelegramBotClientExtended.Routing
 
 
                 TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
-                    handler: (TelegramEndpointDelegate)method.CreateDelegate(typeof(TelegramEndpointDelegate)),
+                    controllerType: method.DeclaringType,
+                    handler: method,
                     allowedType: allowedTypeAttribute.AllowedType,
                     filters: filtersAttributes);
 
@@ -138,16 +139,36 @@ namespace TelegramBotClientExtended.Routing
 
         private void _VerifyMatchTelegramEndpointDelegate(MethodInfo method)
         {
-            bool isMatch = Delegate.CreateDelegate(
-                typeof(TelegramEndpointDelegate), method.DeclaringType, method, false
-            ) != null;
+            Type telegramEndpointDelegate = typeof(TelegramEndpointDelegate);
+            MethodInfo telegramEndpointMethod = telegramEndpointDelegate.GetMethod("Invoke")!;
 
-            // if (isMatch is false)
-            // {
-            //     throw new Exception($"К методу {method.Name} " +
-            //                         $"применён аттрибут {typeof(TelegramEndpointDelegate).FullName}, " +
-            //                         $"хотя он не соответствует делегату {typeof(TelegramEndpointDelegate).FullName}");
-            // }
+            ParameterInfo[] telegramEndpointParams = method.GetParameters();
+            ParameterInfo[] methodParams = method.GetParameters();
+
+            if (method.ReturnType != telegramEndpointMethod.ReturnType)
+            {
+                goto ThrowException;
+            }
+
+            // Проверяем количество параметров
+            if (telegramEndpointParams.Length != methodParams.Length)
+            {
+                goto ThrowException;
+            }
+
+            foreach (ParameterInfo parameter in telegramEndpointParams)
+            {
+                if (methodParams.Contains(parameter) is false)
+                {
+                    goto ThrowException;
+                }
+            }
+            return;
+
+            ThrowException:
+            throw new Exception(
+                $"Сигнатура метода {method} не соввпадает с {typeof(TelegramEndpointDelegate).FullName}"
+            );
         }
 
         private void _VerifyUnduplicated(IEnumerable<ITelegramRouteDescriptor> descriptors)

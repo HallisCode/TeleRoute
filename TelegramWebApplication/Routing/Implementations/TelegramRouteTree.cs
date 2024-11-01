@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TelegramBotClientExtended.Routing.Filters;
+using TelegramWebApplication.Routing.Filters;
 
-namespace TelegramBotClientExtended.Routing
+namespace TelegramWebApplication.Routing
 {
     public class TelegramRouteTree : ITelegramRouteTree
     {
@@ -19,15 +19,29 @@ namespace TelegramBotClientExtended.Routing
 
         public ITelegramRouteDescriptor? Resolve(Update update)
         {
+            return _Resolve(update, Routings);
+        }
+
+        // Ищем конечный дескриптор на основе прохода древа
+        private ITelegramRouteDescriptor? _Resolve(
+            Update update,
+            IEnumerable<ITelegramRouteDescriptor> descriptors
+        )
+        {
             UpdateType updateType = update.Type;
 
-
-            ITelegramRouteDescriptor? _routeDescriptor = null;
-            foreach (ITelegramRouteDescriptor routeDescriptor in Routings)
+            foreach (ITelegramRouteDescriptor routeDescriptor in descriptors)
             {
                 // Проверяем какие условия заданы
                 bool isAllowedTypeDefined = routeDescriptor.AllowedType is not null;
                 bool isFilterDefined = routeDescriptor.Filters is not null;
+
+                // Определяем соответствует ли update заданному типу
+                bool isTypePassed = isAllowedTypeDefined && routeDescriptor.AllowedType.Equals(updateType);
+                if (!isTypePassed)
+                {
+                    continue;
+                }
 
                 // Определяем соответствует ли update фильтрам
                 if (isFilterDefined)
@@ -40,17 +54,15 @@ namespace TelegramBotClientExtended.Routing
                     }
                 }
 
-                // Определяем соответствует ли update заданному типу
-                bool isTypePassed = isAllowedTypeDefined && routeDescriptor.AllowedType.Equals(updateType);
-                if (!isTypePassed)
+                if (routeDescriptor.isBranch)
                 {
-                    continue;
+                    return _Resolve(update, routeDescriptor.InnerBranch!);
                 }
 
                 return routeDescriptor;
             }
 
-            return _routeDescriptor;
+            return null;
         }
     }
 }

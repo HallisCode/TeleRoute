@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Telegram.Bot.Types;
 
-namespace TelegramBotClientExtended.Routing
+namespace TelegramWebApplication.Routing
 {
     public interface ITelegramRouteTree
     {

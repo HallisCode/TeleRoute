@@ -1,6 +1,6 @@
 using System;
 
-namespace TelegramBotClientExtended.Routing.Attributes
+namespace TelegramWebApplication.Routing.Attributes
 {
     /// <summary>
     /// Маркер, что данный класс/метод участвуют в маршрутизации

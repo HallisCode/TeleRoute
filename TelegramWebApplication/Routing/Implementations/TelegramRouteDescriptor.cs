@@ -3,25 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Telegram.Bot.Types.Enums;
-using TelegramBotClientExtended.Routing.Filters;
+using TelegramWebApplication.Routing.Filters;
 
-namespace TelegramBotClientExtended.Routing
+namespace TelegramWebApplication.Routing
 {
-    public record TelegramRouteDescriptor : ITelegramRouteDescriptor
+    public class TelegramRouteDescriptor : ITelegramRouteDescriptor
     {
         public UpdateType? AllowedType { get; }
         public ITelegramFilter[]? Filters { get; init; }
-        public TelegramEndpointDelegate? Handler { get; init; }
-
+        
+        public Type? ControllerType { get; }
+        public MethodInfo? Handler { get; init; }
         public bool isBranch { get; }
-
         public ITelegramRouteDescriptor[]? InnerBranch { get; init; }
 
         public TelegramRouteDescriptor(
-            TelegramEndpointDelegate handler,
+            Type controllerType,
+            MethodInfo handler,
             UpdateType? allowedType = null,
             ITelegramFilter[]? filters = null)
         {
+            ControllerType = controllerType;
             AllowedType = allowedType;
             Filters = filters;
             Handler = handler;
