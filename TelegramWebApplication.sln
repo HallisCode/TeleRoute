@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramWebApplication.Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramWebApplication.Core", "TelegramWebApplication.Core\TelegramWebApplication.Core.csproj", "{BDB32843-03D7-4246-8766-5DC2FDB923BC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC852572-BFDD-40B3-B793-547044ECE0E9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,7 +26,5 @@ Global
 		{BDB32843-03D7-4246-8766-5DC2FDB923BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9A9CA747-E087-4C04-98B4-2EF5F7A2BB19} = {BC852572-BFDD-40B3-B793-547044ECE0E9}
-		{BDB32843-03D7-4246-8766-5DC2FDB923BC} = {BC852572-BFDD-40B3-B793-547044ECE0E9}
 	EndGlobalSection
 EndGlobal

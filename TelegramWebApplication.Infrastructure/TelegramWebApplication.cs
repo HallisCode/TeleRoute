@@ -1,15 +1,15 @@
 using System;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using SimpleNetFramework.Core.Server;
 using SimpleNetFramework.Infrastructure;
+using SimpleNetFramework.Infrastructure.Server;
 using Telegram.Bot.Types;
 
 
 namespace TelegramWebApplication.Infrastructure
 {
-    public abstract class TelegramWebApplication : WebApplicationBase<Update>, ITelegramWebApplication
+    public class TelegramWebApplication : WebApplicationBase<Update>, ITelegramWebApplication
     {
         public TelegramWebApplication(IServer server, IServiceProvider provider) : base(server, provider)
         {
@@ -34,6 +34,14 @@ namespace TelegramWebApplication.Infrastructure
             return Task.CompletedTask;
         }
 
-        protected abstract IHttpResponse GetResponse200();
+        protected virtual IHttpResponse GetResponse200()
+        {
+            return new HttpResponse(
+                statusCode: 200,
+                message: "OK",
+                body: null,
+                protocol: "HTTP/1.1"
+            );
+        }
     }
 }
