@@ -42,10 +42,10 @@ namespace TeleRoute.Infrastructure.Routing
 
         private void _AddAllClassesWithTelegramRouteAttributeFromAssembly(Assembly assembly)
         {
-            // Находим все классы с TelegramRouteAttribute
+            // Находим все классы с TeleRouteAttribute
             Type[] types = assembly.GetTypes();
             Type[] classTypeWithAttribute = types.Where(
-                (type) => type.IsClass && Attribute.IsDefined(type, typeof(TelegramRouteAttribute))
+                (type) => type.IsClass && Attribute.IsDefined(type, typeof(TeleRouteAttribute))
             ).ToArray();
 
             List<IRouteDescriptor> descriptors = new List<IRouteDescriptor>();
@@ -59,9 +59,9 @@ namespace TeleRoute.Infrastructure.Routing
                     );
                 IFilter[] filtersAttributes = attributes.OfType<IFilter>().ToArray();
 
-                // Получаем все методы класса с аттрибутом TelegramRouteAttribute
+                // Получаем все методы класса с аттрибутом TeleRouteAttribute
                 MethodInfo[] methodsWithAttribute = classType.GetMethods().Where(
-                    (method) => Attribute.IsDefined(method, typeof(TelegramRouteAttribute))
+                    (method) => Attribute.IsDefined(method, typeof(TeleRouteAttribute))
                 ).ToArray();
                 if (methodsWithAttribute.Length <= 0)
                 {
@@ -103,14 +103,14 @@ namespace TeleRoute.Infrastructure.Routing
             {
                 _VerifyMatchTelegramEndpointDelegate(method);
 
-                TelegramRouteAttribute? methodRouteAttribute = (TelegramRouteAttribute?)
-                    Attribute.GetCustomAttribute(method, typeof(TelegramRouteAttribute));
+                TeleRouteAttribute? methodRouteAttribute = (TeleRouteAttribute?)
+                    Attribute.GetCustomAttribute(method, typeof(TeleRouteAttribute));
 
-                // Проверяем что у метода присутствует аттрибут TelegramRouteAttribute
+                // Проверяем что у метода присутствует аттрибут TeleRouteAttribute
                 if (methodRouteAttribute is null)
                 {
                     throw new Exception($"У метода {method.Module.Assembly.Location} отсутствует аттрибут " +
-                                        $"{typeof(TelegramRouteAttribute).FullName}");
+                                        $"{typeof(TeleRouteAttribute).FullName}");
                 }
 
                 object[] attributes = method.GetCustomAttributes(false);
@@ -181,7 +181,7 @@ namespace TeleRoute.Infrastructure.Routing
             if (descriptors.Count() != new HashSet<IRouteDescriptor>(descriptors).Count)
             {
                 throw new Exception($"Были найдены дублирующиеся routes. " +
-                                    $"Даже наличие двух методов с пустыми аттрибутами {typeof(TelegramRouteAttribute)} " +
+                                    $"Даже наличие двух методов с пустыми аттрибутами {typeof(TeleRouteAttribute)} " +
                                     $"является ошибкой, так как маршрутизация должна быть точной." +
                                     $"\nОшибка не не содержит полезной информации ? " +
                                     $"t.me/HallisPlus напишите разработчику что он слишком ленивый, пусть исправляет.");
