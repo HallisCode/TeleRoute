@@ -1,7 +1,7 @@
 using System;
 using Telegram.Bot.Types.Enums;
 
-namespace TelegramWebApplication.Routing.Attributes
+namespace TelegramWebApplication.Infrastructure.Routing.Attributes
 {
     public class AllowedUpdateTypeAttribute : Attribute
     {

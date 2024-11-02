@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace TelegramWebApplication.Routing
+namespace TelegramWebApplication.Infrastructure.Routing
 {
     public class TelegramControllerActivator : ITelegramControllerActivator
     {

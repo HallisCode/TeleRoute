@@ -8,11 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\SimpleNetFramework\SimpleNetFramework\SimpleNetFramework.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Telegram.Bot" Version="21.11.0" />
+      <PackageReference Include="Telegram.Bot" Version="19.0.0" />
     </ItemGroup>
 
 </Project>

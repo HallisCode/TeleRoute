@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TelegramWebApplication.Routing.Filters;
+using TelegramWebApplication.Infrastructure.Routing.Filters;
 
-namespace TelegramWebApplication.Routing
+namespace TelegramWebApplication.Infrastructure.Routing
 {
     public class TelegramRouteTree : ITelegramRouteTree
     {
@@ -22,6 +22,7 @@ namespace TelegramWebApplication.Routing
             return _Resolve(update, Routings);
         }
 
+        
         // Ищем конечный дескриптор на основе прохода древа
         private ITelegramRouteDescriptor? _Resolve(
             Update update,
@@ -29,7 +30,9 @@ namespace TelegramWebApplication.Routing
         )
         {
             UpdateType updateType = update.Type;
+            ITelegramRouteDescriptor? _descriptor = null;
 
+            TakeDescriptorLoop:
             foreach (ITelegramRouteDescriptor routeDescriptor in descriptors)
             {
                 // Проверяем какие условия заданы
@@ -43,26 +46,33 @@ namespace TelegramWebApplication.Routing
                     continue;
                 }
 
-                // Определяем соответствует ли update фильтрам
+                // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
                 if (isFilterDefined)
                 {
                     foreach (ITelegramFilter filter in routeDescriptor.Filters)
                     {
-                        bool isFilterPassed = filter.IsMatch(update);
-
-                        if (!isFilterPassed) continue;
+                        if (!filter.IsMatch(update))
+                        {
+                            goto TakeDescriptorLoop;
+                        }
                     }
                 }
-
+                
+                // Если присутствуют вложенные маршруты, по ним проходимся тоже
                 if (routeDescriptor.isBranch)
                 {
-                    return _Resolve(update, routeDescriptor.InnerBranch!);
+                    _descriptor = _Resolve(update, routeDescriptor.InnerBranch!);
                 }
-
-                return routeDescriptor;
+                
+                // Если были определены оба условия и они пройдены, то это более точное совпадение, нету смысла
+                // дальше искать маршрут. Иначе продолжаем искать до более точного совпадения
+                if (isAllowedTypeDefined && isFilterDefined)
+                {
+                    return _descriptor;
+                }
             }
 
-            return null;
+            return _descriptor;
         }
     }
 }

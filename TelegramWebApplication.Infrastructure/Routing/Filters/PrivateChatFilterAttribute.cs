@@ -2,7 +2,7 @@ using System;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace TelegramWebApplication.Routing.Filters
+namespace TelegramWebApplication.Infrastructure.Routing.Filters
 {
     public class PrivateChatFilterAttribute : Attribute, ITelegramFilter
     {

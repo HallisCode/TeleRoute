@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace TelegramWebApplication.Routing
+namespace TelegramWebApplication.Infrastructure.Routing
 {
     public delegate Task TelegramEndpointDelegate(Update update);
 }
