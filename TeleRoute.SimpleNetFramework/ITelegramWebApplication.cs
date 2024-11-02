@@ -1,4 +1,4 @@
-namespace TelegramWebApplication.Core
+namespace TeleRoute.SimpleNetFramework
 {
     public interface ITelegramWebApplication
     {

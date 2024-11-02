@@ -6,9 +6,9 @@ using SimpleNetFramework.Core.Server;
 using SimpleNetFramework.Infrastructure;
 using SimpleNetFramework.Infrastructure.Server;
 using Telegram.Bot.Types;
-using TelegramWebApplication.Core;
+using TeleRoute.Core;
 
-namespace TelegramWebApplication.Infrastructure
+namespace TeleRoute.SimpleNetFramework
 {
     public class TelegramWebApplication : WebApplicationBase<Update>, ITelegramWebApplication
     {

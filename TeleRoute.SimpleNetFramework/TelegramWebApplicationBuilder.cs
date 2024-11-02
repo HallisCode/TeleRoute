@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleNetFramework.Core;
 using SimpleNetFramework.Core.Server;
 
-namespace TelegramWebApplication.Infrastructure
+namespace TeleRoute.SimpleNetFramework
 {
     public class TelegramWebApplicationBuilder : IWebApplicationBuilder<TelegramWebApplication>
     {

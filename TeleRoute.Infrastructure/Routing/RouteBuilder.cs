@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Telegram.Bot.Types.Enums;
-using TelegramWebApplication.Core.Routing;
-using TelegramWebApplication.Core.Routing.Filters;
-using TelegramWebApplication.Infrastructure.Routing.Attributes;
+using TeleRoute.Core.Routing;
+using TeleRoute.Core.Routing.Filters;
+using TeleRoute.Infrastructure.Routing.Attributes;
 
-namespace TelegramWebApplication.Infrastructure.Routing
+namespace TeleRoute.Infrastructure.Routing
 {
     public class RouteBuilder : IRouteBuilder
     {

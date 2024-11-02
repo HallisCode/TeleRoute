@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using SimpleNetFramework.Core.Middleware;
 using Telegram.Bot.Types;
-using TelegramWebApplication.Core.Routing;
+using TeleRoute.Core.Routing;
 
-namespace TelegramWebApplication.Infrastructure.Routing.Middlewares
+namespace TeleRoute.SimpleNetFramework.Middlewares
 {
     /// <summary>
     /// Вызывает контроллер для обработки текущего update. Не вызыает последующий обработчик middleware.

@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
 using Telegram.Bot.Types.Enums;
-using TelegramWebApplication.Core.Routing.Filters;
+using TeleRoute.Core.Routing.Filters;
 
-namespace TelegramWebApplication.Core.Routing
+namespace TeleRoute.Core.Routing
 {
     public interface IRouteDescriptor : IEquatable<IRouteDescriptor>
     {

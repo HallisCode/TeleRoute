@@ -1,7 +1,7 @@
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace TelegramWebApplication.Core.Routing.Filters
+namespace TeleRoute.Core.Routing.Filters
 {
     public interface IFilter
     {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using TelegramWebApplication.Core.Routing;
+using TeleRoute.Core.Routing;
 
-namespace TelegramWebApplication.Infrastructure.Routing
+namespace TeleRoute.Infrastructure.Routing
 {
     public class RouteHandler : IRouteHandler
     {
