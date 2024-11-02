@@ -49,14 +49,16 @@ namespace TeleRoute.Infrastructure.Routing
                 }
 
                 // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
+                bool isFiltersPassed = true;
                 if (isFilterDefined)
                 {
-                    foreach (IFilter filter in routeDescriptor.Filters)
+                    isFiltersPassed = routeDescriptor.Filters.All(filter =>
+                        filter.IsMatch(update) && filter.IsTypeAllowed(updateType)
+                    );
+
+                    if (!isFiltersPassed)
                     {
-                        if (!filter.IsMatch(update))
-                        {
-                            goto TakeDescriptorLoop;
-                        }
+                        continue;
                     }
                 }
 
@@ -73,7 +75,10 @@ namespace TeleRoute.Infrastructure.Routing
                     return _descriptor;
                 }
 
-                _descriptor = routeDescriptor;
+                if (isTypePassed || isFiltersPassed)
+                {
+                    _descriptor = routeDescriptor;
+                }
             }
 
             return _descriptor;

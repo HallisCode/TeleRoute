@@ -7,6 +7,6 @@ namespace TeleRoute.Core.Routing.Filters
     {
         UpdateType? AllowedType { get; }
         bool IsMatch(Update update);
-        bool IsTypeConformsAllowedType(UpdateType type);
+        bool IsTypeAllowed(UpdateType type);
     }
 }

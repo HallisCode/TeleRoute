@@ -122,7 +122,7 @@ namespace TeleRoute.Infrastructure.Routing
                 IFilter[] filtersAttributes = attributes.OfType<IFilter>().ToArray();
 
 
-                Type[] neededTypesForController = method.DeclaringType
+                Type[] neededTypesForController = method.DeclaringType!
                     .GetConstructors().First()
                     .GetParameters()
                     .Select((ParameterInfo parameter) => parameter.ParameterType).ToArray();

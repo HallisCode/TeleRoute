@@ -11,12 +11,10 @@ namespace TeleRoute.Infrastructure.Routing.Filters
 
         public bool IsMatch(Update update)
         {
-            if (!IsTypeConformsAllowedType(update.Type)) return false;
-            
             return update.Message.Chat.Type == ChatType.Private;
         }
 
-        public bool IsTypeConformsAllowedType(UpdateType type)
+        public bool IsTypeAllowed(UpdateType type)
         {
             if (AllowedType is null) return true;
 
