@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TelegramWebApplication.Infrastructure.Routing.Filters;
+using TelegramWebApplication.Core.Routing;
+using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Infrastructure.Routing
 {
@@ -22,7 +23,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
             return _Resolve(update, Routings);
         }
 
-        
+
         // Ищем конечный дескриптор на основе прохода древа
         private ITelegramRouteDescriptor? _Resolve(
             Update update,
@@ -57,13 +58,13 @@ namespace TelegramWebApplication.Infrastructure.Routing
                         }
                     }
                 }
-                
+
                 // Если присутствуют вложенные маршруты, по ним проходимся тоже
                 if (routeDescriptor.isBranch)
                 {
                     _descriptor = _Resolve(update, routeDescriptor.InnerBranch!);
                 }
-                
+
                 // Если были определены оба условия и они пройдены, то это более точное совпадение, нету смысла
                 // дальше искать маршрут. Иначе продолжаем искать до более точного совпадения
                 if (isAllowedTypeDefined && isFilterDefined)

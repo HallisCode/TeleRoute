@@ -1,7 +1,6 @@
-namespace TelegramWebApplication.Infrastructure
+namespace TelegramWebApplication.Core
 {
     public interface ITelegramWebApplication
     {
-        
     }
 }

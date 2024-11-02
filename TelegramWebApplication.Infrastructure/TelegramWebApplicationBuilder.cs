@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 
 namespace TelegramWebApplication.Infrastructure
 {
-    public class TelegramWebApplicationBuilder : IWebApplicationBuilder<Update>
+    public class TelegramWebApplicationBuilder : IWebApplicationBuilder<TelegramWebApplication>
     {
         public IServiceCollection Services { get; protected set; } = new ServiceCollection();
         public IServer? Server { get; protected set; }
@@ -17,8 +17,12 @@ namespace TelegramWebApplication.Infrastructure
             Server = server;
         }
 
-        public IWebApplication<Update> Build()
+        public TelegramWebApplication Build()
         {
+            // Добавляем ServiceProvider
+            IServiceProvider serviceProvider = Services.BuildServiceProvider();
+            Services.AddSingleton<IServiceProvider>(serviceProvider);
+
             if (Server is null)
             {
                 throw new Exception($"Не настроен {nameof(Server)}, необходимо вызвать {nameof(SetServer)}.");

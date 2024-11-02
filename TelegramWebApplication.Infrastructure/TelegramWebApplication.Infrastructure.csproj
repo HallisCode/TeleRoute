@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TelegramWebApplication.Core\TelegramWebApplication.Core.csproj" />
-      <ProjectReference Include="..\..\SimpleNetFramework\SimpleNetFramework.Infrastructure\SimpleNetFramework.Infrastructure.csproj" />
+        <ProjectReference Include="..\TelegramWebApplication.Core\TelegramWebApplication.Core.csproj"/>
+        <ProjectReference Include="..\..\SimpleNetFramework\SimpleNetFramework.Infrastructure\SimpleNetFramework.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

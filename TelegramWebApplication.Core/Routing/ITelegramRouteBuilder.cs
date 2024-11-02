@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
 using Telegram.Bot.Types.Enums;
-using TelegramWebApplication.Infrastructure.Routing.Filters;
+using TelegramWebApplication.Core.Routing.Filters;
 
-namespace TelegramWebApplication.Infrastructure.Routing
+namespace TelegramWebApplication.Core.Routing
 {
     public interface ITelegramRouteBuilder
     {

@@ -5,6 +5,7 @@ using SimpleNetFramework.Core.Server;
 using SimpleNetFramework.Infrastructure;
 using SimpleNetFramework.Infrastructure.Server;
 using Telegram.Bot.Types;
+using TelegramWebApplication.Core;
 
 
 namespace TelegramWebApplication.Infrastructure

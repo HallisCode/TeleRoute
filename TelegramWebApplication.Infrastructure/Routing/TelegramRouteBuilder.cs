@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Telegram.Bot.Types.Enums;
+using TelegramWebApplication.Core.Routing;
+using TelegramWebApplication.Core.Routing.Filters;
 using TelegramWebApplication.Infrastructure.Routing.Attributes;
-using TelegramWebApplication.Infrastructure.Routing.Filters;
 
 namespace TelegramWebApplication.Infrastructure.Routing
 {
@@ -80,7 +80,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
                 if (isClassHasConditions)
                 {
-                    ITelegramRouteDescriptor descriptor = new TelegramRouteDescriptor(
+                    ITelegramRouteDescriptor descriptor = TelegramRouteDescriptor.CreateBranch(
                         descriptors,
                         allowedTypeAttribute?.AllowedType,
                         filtersAttributes
@@ -124,11 +124,17 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
 
 
-                TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor(
+                Type[] neededTypesForController = method.DeclaringType
+                    .GetConstructors().First()
+                    .GetParameters()
+                    .Select((ParameterInfo parameter) => parameter.ParameterType).ToArray();
+
+                TelegramRouteDescriptor routeDescriptor = TelegramRouteDescriptor.CreateEndpoint(
                     controllerType: method.DeclaringType,
                     handler: method,
                     allowedType: allowedTypeAttribute.AllowedType,
-                    filters: filtersAttributes);
+                    filters: filtersAttributes,
+                    neededTypesForController: neededTypesForController);
 
                 descriptors.Add(routeDescriptor);
             }
@@ -163,6 +169,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                     goto ThrowException;
                 }
             }
+
             return;
 
             ThrowException:

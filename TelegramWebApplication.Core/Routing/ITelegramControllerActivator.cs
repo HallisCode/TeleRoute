@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
-namespace TelegramWebApplication.Infrastructure.Routing
+namespace TelegramWebApplication.Core.Routing
 {
     public interface ITelegramControllerActivator
     {
