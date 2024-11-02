@@ -7,12 +7,12 @@ namespace TeleRoute.Infrastructure.Routing.Filters
 {
     public class PrivateChatFilterAttribute : Attribute, IFilter
     {
-        public UpdateType? AllowedType { get; }
+        public UpdateType? AllowedType { get; } = UpdateType.Message;
 
         public bool IsMatch(Update update)
         {
             if (!IsTypeConformsAllowedType(update.Type)) return false;
-
+            
             return update.Message.Chat.Type == ChatType.Private;
         }
 
