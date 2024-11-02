@@ -42,12 +42,17 @@ namespace TelegramWebApplication.Infrastructure
 
         protected virtual IHttpResponse GetResponse200()
         {
-            return new HttpResponse(
+            HttpResponse response = new HttpResponse(
                 statusCode: 200,
                 message: "OK",
                 body: null,
                 protocol: "HTTP/1.1"
             );
+            
+            response.Headers.Add("Connection", "close");
+            response.Headers.Add("Content-type", "application/json");
+
+            return response;
         }
     }
 }
