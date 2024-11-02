@@ -5,10 +5,11 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>TelegramWebApplication.Core</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Telegram.Bot" Version="19.0.0"/>
+        <PackageReference Include="Telegram.Bot" Version="21.11.0" />
     </ItemGroup>
 
 </Project>

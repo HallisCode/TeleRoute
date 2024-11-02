@@ -5,26 +5,26 @@ using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Core.Routing
 {
-    public interface ITelegramRouteBuilder
+    public interface IRouteBuilder
     {
         /// <summary>
         /// Добавляет все маршруты из сборки, на основа аттрибутов типа <see cref="TelegramRoute"/>.
         /// </summary>
         /// <param name="assembly">Сборка из которой нужно найти все маршруты.</param>
         /// <returns></returns>
-        ITelegramRouteBuilder AddFromAssembly(Assembly assembly);
+        IRouteBuilder AddFromAssembly(Assembly assembly);
 
         /// <summary>
         /// Добавляет маршрут.
         /// </summary>
         /// <param name="routeDescriptor"></param>
         /// <returns></returns>
-        ITelegramRouteBuilder Add(ITelegramRouteDescriptor routeDescriptor);
+        IRouteBuilder Add(IRouteDescriptor routeDescriptor);
 
         /// <summary>
         /// Создаёт древо маршрутов.
         /// </summary>
         /// <returns></returns>
-        ITelegramRouteTree Build();
+        IRouteTree Build();
     }
 }

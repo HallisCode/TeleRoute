@@ -8,31 +8,31 @@ using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Infrastructure.Routing
 {
-    public class TelegramRouteDescriptor : ITelegramRouteDescriptor
+    public class RouteDescriptor : IRouteDescriptor
     {
         public UpdateType AllowedType { get; protected set; }
-        public ITelegramFilter[]? Filters { get; protected set; }
+        public IFilter[]? Filters { get; protected set; }
 
         public Type[]? NeededTypesForController { get; protected set; }
         public Type? ControllerType { get; protected set; }
         public MethodInfo? Handler { get; protected set; }
         public bool isBranch { get; protected set; }
-        public ITelegramRouteDescriptor[]? InnerBranch { get; protected set; }
+        public IRouteDescriptor[]? InnerBranch { get; protected set; }
 
-        protected TelegramRouteDescriptor()
+        protected RouteDescriptor()
         {
         }
 
         // Добавляет конечный обработчик
-        public static TelegramRouteDescriptor CreateEndpoint(
+        public static RouteDescriptor CreateEndpoint(
             Type controllerType,
             MethodInfo handler,
             Type[] neededTypesForController,
             UpdateType allowedType = UpdateType.Unknown,
-            ITelegramFilter[]? filters = null
+            IFilter[]? filters = null
         )
         {
-            TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor();
+            RouteDescriptor routeDescriptor = new RouteDescriptor();
 
             routeDescriptor.NeededTypesForController = neededTypesForController;
             routeDescriptor.ControllerType = controllerType;
@@ -44,13 +44,13 @@ namespace TelegramWebApplication.Infrastructure.Routing
         }
 
         // Добавляет ветвь
-        public static TelegramRouteDescriptor CreateBranch(
-            IEnumerable<ITelegramRouteDescriptor> innerBranch,
+        public static RouteDescriptor CreateBranch(
+            IEnumerable<IRouteDescriptor> innerBranch,
             UpdateType allowedType = UpdateType.Unknown,
-            ITelegramFilter[]? filters = null
+            IFilter[]? filters = null
         )
         {
-            TelegramRouteDescriptor routeDescriptor = new TelegramRouteDescriptor();
+            RouteDescriptor routeDescriptor = new RouteDescriptor();
 
             routeDescriptor.AllowedType = allowedType;
             routeDescriptor.Filters = filters;
@@ -60,7 +60,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
             return routeDescriptor;
         }
 
-        public virtual bool Equals(ITelegramRouteDescriptor? other)
+        public virtual bool Equals(IRouteDescriptor? other)
         {
             if (other is not null)
             {

@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramWebApplication.Infrastructure", "TelegramWebApplication.Infrastructure\TelegramWebApplication.Infrastructure.csproj", "{9A9CA747-E087-4C04-98B4-2EF5F7A2BB19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeleRoute.Infrastructure", "TeleRoute.Infrastructure\TeleRoute.Infrastructure.csproj", "{9A9CA747-E087-4C04-98B4-2EF5F7A2BB19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramWebApplication.Core", "TelegramWebApplication.Core\TelegramWebApplication.Core.csproj", "{BDB32843-03D7-4246-8766-5DC2FDB923BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeleRoute.Core", "TeleRoute.Core\TeleRoute.Core.csproj", "{BDB32843-03D7-4246-8766-5DC2FDB923BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeleRoute.SimpleNetFramework", "TeleRoute.SimpleNetFramework\TeleRoute.SimpleNetFramework.csproj", "{FAA03C48-665A-4509-A36A-F184B43DC449}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{BDB32843-03D7-4246-8766-5DC2FDB923BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDB32843-03D7-4246-8766-5DC2FDB923BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDB32843-03D7-4246-8766-5DC2FDB923BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAA03C48-665A-4509-A36A-F184B43DC449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAA03C48-665A-4509-A36A-F184B43DC449}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAA03C48-665A-4509-A36A-F184B43DC449}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAA03C48-665A-4509-A36A-F184B43DC449}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

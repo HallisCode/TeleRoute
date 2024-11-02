@@ -9,32 +9,32 @@ using TelegramWebApplication.Infrastructure.Routing.Attributes;
 
 namespace TelegramWebApplication.Infrastructure.Routing
 {
-    public class TelegramRouteBuilder : ITelegramRouteBuilder
+    public class RouteBuilder : IRouteBuilder
     {
-        private List<ITelegramRouteDescriptor> _routes = new List<ITelegramRouteDescriptor>();
+        private List<IRouteDescriptor> _routes = new List<IRouteDescriptor>();
 
-        public TelegramRouteBuilder()
+        public RouteBuilder()
         {
         }
 
-        public ITelegramRouteBuilder AddFromAssembly(Assembly assembly)
+        public IRouteBuilder AddFromAssembly(Assembly assembly)
         {
             _AddAllClassesWithTelegramRouteAttributeFromAssembly(assembly);
 
             return this;
         }
 
-        public ITelegramRouteBuilder Add(ITelegramRouteDescriptor routeDescriptor)
+        public IRouteBuilder Add(IRouteDescriptor routeDescriptor)
         {
             _routes.Add(routeDescriptor);
 
             return this;
         }
 
-        public ITelegramRouteTree Build()
+        public IRouteTree Build()
         {
             _VerifyUnduplicated(_routes);
-            ITelegramRouteTree routeTree = new TelegramRouteTree(_routes);
+            IRouteTree routeTree = new RouteTree(_routes);
 
             _routes.Clear();
             return routeTree;
@@ -48,7 +48,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 (type) => type.IsClass && Attribute.IsDefined(type, typeof(TelegramRouteAttribute))
             ).ToArray();
 
-            List<ITelegramRouteDescriptor> descriptors = new List<ITelegramRouteDescriptor>();
+            List<IRouteDescriptor> descriptors = new List<IRouteDescriptor>();
             foreach (Type classType in classTypeWithAttribute)
             {
                 object[] attributes = classType.GetCustomAttributes(false);
@@ -57,7 +57,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                     Attribute.GetCustomAttribute(
                         classType, typeof(AllowedUpdateTypeAttribute)
                     );
-                ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
+                IFilter[] filtersAttributes = attributes.OfType<IFilter>().ToArray();
 
                 // Получаем все методы класса с аттрибутом TelegramRouteAttribute
                 MethodInfo[] methodsWithAttribute = classType.GetMethods().Where(
@@ -69,7 +69,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 }
 
                 // Получаем дескрипторы для всех методов, по аналогии с классом
-                List<ITelegramRouteDescriptor> methodsDescriptors = _GetRoutesFromMethods(methodsWithAttribute);
+                List<IRouteDescriptor> methodsDescriptors = _GetRoutesFromMethods(methodsWithAttribute);
 
                 // Проверяем какие условия заданы у класса
                 bool isAllowedTypeDefined = allowedTypeAttribute is not null;
@@ -78,7 +78,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
                 if (isClassHasConditions)
                 {
-                    ITelegramRouteDescriptor descriptor = TelegramRouteDescriptor.CreateBranch(
+                    IRouteDescriptor descriptor = RouteDescriptor.CreateBranch(
                         innerBranch: methodsDescriptors,
                         allowedType: allowedTypeAttribute?.AllowedType ?? UpdateType.Unknown,
                         filters: filtersAttributes
@@ -95,9 +95,9 @@ namespace TelegramWebApplication.Infrastructure.Routing
             _routes.AddRange(descriptors);
         }
 
-        private List<ITelegramRouteDescriptor> _GetRoutesFromMethods(IEnumerable<MethodInfo> methods)
+        private List<IRouteDescriptor> _GetRoutesFromMethods(IEnumerable<MethodInfo> methods)
         {
-            List<ITelegramRouteDescriptor> descriptors = new List<ITelegramRouteDescriptor>();
+            List<IRouteDescriptor> descriptors = new List<IRouteDescriptor>();
 
             foreach (MethodInfo method in methods)
             {
@@ -119,7 +119,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                     Attribute.GetCustomAttribute(
                         method, typeof(AllowedUpdateTypeAttribute)
                     );
-                ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
+                IFilter[] filtersAttributes = attributes.OfType<IFilter>().ToArray();
 
 
                 Type[] neededTypesForController = method.DeclaringType
@@ -127,7 +127,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                     .GetParameters()
                     .Select((ParameterInfo parameter) => parameter.ParameterType).ToArray();
 
-                TelegramRouteDescriptor routeDescriptor = TelegramRouteDescriptor.CreateEndpoint(
+                RouteDescriptor routeDescriptor = RouteDescriptor.CreateEndpoint(
                     controllerType: method.DeclaringType,
                     handler: method,
                     allowedType: allowedTypeAttribute?.AllowedType ?? UpdateType.Unknown,
@@ -143,7 +143,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
 
         private void _VerifyMatchTelegramEndpointDelegate(MethodInfo method)
         {
-            Type telegramEndpointDelegate = typeof(TelegramEndpointDelegate);
+            Type telegramEndpointDelegate = typeof(EndpointDelegate);
             MethodInfo telegramEndpointMethod = telegramEndpointDelegate.GetMethod("Invoke")!;
 
             ParameterInfo[] telegramEndpointParams = method.GetParameters();
@@ -172,13 +172,13 @@ namespace TelegramWebApplication.Infrastructure.Routing
 
             ThrowException:
             throw new Exception(
-                $"Сигнатура метода {method} не соввпадает с {typeof(TelegramEndpointDelegate).FullName}"
+                $"Сигнатура метода {method} не соввпадает с {typeof(EndpointDelegate).FullName}"
             );
         }
 
-        private void _VerifyUnduplicated(IEnumerable<ITelegramRouteDescriptor> descriptors)
+        private void _VerifyUnduplicated(IEnumerable<IRouteDescriptor> descriptors)
         {
-            if (descriptors.Count() != new HashSet<ITelegramRouteDescriptor>(descriptors).Count)
+            if (descriptors.Count() != new HashSet<IRouteDescriptor>(descriptors).Count)
             {
                 throw new Exception($"Были найдены дублирующиеся routes. " +
                                     $"Даже наличие двух методов с пустыми аттрибутами {typeof(TelegramRouteAttribute)} " +

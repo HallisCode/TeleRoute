@@ -8,33 +8,33 @@ using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Infrastructure.Routing
 {
-    public class TelegramRouteTree : ITelegramRouteTree
+    public class RouteTree : IRouteTree
     {
-        public IReadOnlyCollection<ITelegramRouteDescriptor> Routings { get; private set; }
+        public IReadOnlyCollection<IRouteDescriptor> Routings { get; private set; }
 
 
-        public TelegramRouteTree(IEnumerable<ITelegramRouteDescriptor> routings)
+        public RouteTree(IEnumerable<IRouteDescriptor> routings)
         {
             Routings = routings.ToArray();
         }
 
-        public ITelegramRouteDescriptor? Resolve(Update update)
+        public IRouteDescriptor? Resolve(Update update)
         {
             return _Resolve(update, Routings);
         }
 
 
         // Ищем конечный дескриптор на основе прохода древа
-        private ITelegramRouteDescriptor? _Resolve(
+        private IRouteDescriptor? _Resolve(
             Update update,
-            IEnumerable<ITelegramRouteDescriptor> descriptors
+            IEnumerable<IRouteDescriptor> descriptors
         )
         {
             UpdateType updateType = update.Type;
-            ITelegramRouteDescriptor? _descriptor = null;
+            IRouteDescriptor? _descriptor = null;
 
             TakeDescriptorLoop:
-            foreach (ITelegramRouteDescriptor routeDescriptor in descriptors)
+            foreach (IRouteDescriptor routeDescriptor in descriptors)
             {
                 // Проверяем какие условия заданы
                 bool isAllowedTypeDefined = routeDescriptor.AllowedType is not UpdateType.Unknown;
@@ -51,7 +51,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
                 if (isFilterDefined)
                 {
-                    foreach (ITelegramFilter filter in routeDescriptor.Filters)
+                    foreach (IFilter filter in routeDescriptor.Filters)
                     {
                         if (!filter.IsMatch(update))
                         {

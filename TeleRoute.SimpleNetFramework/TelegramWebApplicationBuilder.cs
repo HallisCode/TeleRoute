@@ -2,7 +2,6 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleNetFramework.Core;
 using SimpleNetFramework.Core.Server;
-using Telegram.Bot.Types;
 
 namespace TelegramWebApplication.Infrastructure
 {

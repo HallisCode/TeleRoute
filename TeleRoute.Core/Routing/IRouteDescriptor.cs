@@ -5,15 +5,15 @@ using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Core.Routing
 {
-    public interface ITelegramRouteDescriptor : IEquatable<ITelegramRouteDescriptor>
+    public interface IRouteDescriptor : IEquatable<IRouteDescriptor>
     {
         UpdateType AllowedType { get; }
-        ITelegramFilter[]? Filters { get; }
+        IFilter[]? Filters { get; }
 
         Type[]? NeededTypesForController { get; }
         Type? ControllerType { get; }
         MethodInfo? Handler { get; }
         bool isBranch { get; }
-        ITelegramRouteDescriptor[]? InnerBranch { get; }
+        IRouteDescriptor[]? InnerBranch { get; }
     }
 }

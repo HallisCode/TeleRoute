@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SimpleNetFramework\SimpleNetFramework.Infrastructure\SimpleNetFramework.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Telegram.Bot">
+        <HintPath>..\..\..\..\.nuget\packages\telegram.bot\21.11.0\lib\net6.0\Telegram.Bot.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>TelegramWebApplication</RootNamespace>
+    </PropertyGroup>
+    
+
+</Project>

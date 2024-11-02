@@ -5,7 +5,7 @@ using TelegramWebApplication.Core.Routing.Filters;
 
 namespace TelegramWebApplication.Infrastructure.Routing.Filters
 {
-    public class PrivateChatFilterAttribute : Attribute, ITelegramFilter
+    public class PrivateChatFilterAttribute : Attribute, IFilter
     {
         public UpdateType? AllowedType { get; }
 

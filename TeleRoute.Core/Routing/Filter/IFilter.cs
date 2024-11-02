@@ -3,7 +3,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace TelegramWebApplication.Core.Routing.Filters
 {
-    public interface ITelegramFilter
+    public interface IFilter
     {
         UpdateType? AllowedType { get; }
         bool IsMatch(Update update);

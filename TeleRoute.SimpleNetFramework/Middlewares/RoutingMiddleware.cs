@@ -14,22 +14,22 @@ namespace TelegramWebApplication.Infrastructure.Routing.Middlewares
     /// </summary>
     public class RoutingMiddleware : IMiddleware<Update>
     {
-        private readonly ITelegramRouteTree _telegramRouteTree;
+        private readonly IRouteTree _routeTree;
         private readonly IServiceProvider _serviceProvider;
 
 
         public MiddlewareDelegate<Update> Next { get; }
 
 
-        public RoutingMiddleware(ITelegramRouteTree telegramRouteTree, IServiceProvider provider)
+        public RoutingMiddleware(IRouteTree routeTree, IServiceProvider provider)
         {
-            _telegramRouteTree = telegramRouteTree;
+            _routeTree = routeTree;
             _serviceProvider = provider;
         }
 
         public async Task Invoke(Update update)
         {
-            ITelegramRouteDescriptor? telegramRouteDescriptor = _telegramRouteTree.Resolve(update);
+            IRouteDescriptor? telegramRouteDescriptor = _routeTree.Resolve(update);
 
             if (telegramRouteDescriptor is null) return;
 
