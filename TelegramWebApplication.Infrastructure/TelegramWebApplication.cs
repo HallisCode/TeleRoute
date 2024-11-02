@@ -1,11 +1,15 @@
 using System;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using SimpleNetFramework.Core.Server;
 using SimpleNetFramework.Infrastructure;
 using SimpleNetFramework.Infrastructure.Server;
 using Telegram.Bot.Types;
 using TelegramWebApplication.Core;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 
 namespace TelegramWebApplication.Infrastructure
@@ -22,9 +26,10 @@ namespace TelegramWebApplication.Infrastructure
 
             if (_middlewares.Count > 0)
             {
-                Update? update = (Update?)JsonSerializer.Deserialize(request.Request.Body, typeof(Update));
+                string _encodedBody = Encoding.UTF8.GetString(request.Request.Body);
+                Update? update = JsonConvert.DeserializeObject<Update>(_encodedBody);
 
-                if (update is null)
+                if (update.Id == 0)
                 {
                     return Task.CompletedTask;
                 }

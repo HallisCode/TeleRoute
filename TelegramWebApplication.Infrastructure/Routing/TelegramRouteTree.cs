@@ -37,11 +37,12 @@ namespace TelegramWebApplication.Infrastructure.Routing
             foreach (ITelegramRouteDescriptor routeDescriptor in descriptors)
             {
                 // Проверяем какие условия заданы
-                bool isAllowedTypeDefined = routeDescriptor.AllowedType is not null;
-                bool isFilterDefined = routeDescriptor.Filters is not null;
+                bool isAllowedTypeDefined = routeDescriptor.AllowedType is not UpdateType.Unknown;
+                bool isFilterDefined = routeDescriptor.Filters.Length > 0;
 
                 // Определяем соответствует ли update заданному типу
-                bool isTypePassed = isAllowedTypeDefined && routeDescriptor.AllowedType.Equals(updateType);
+                // Если type is 'Unknown' -> разрешены все типы
+                bool isTypePassed = !isAllowedTypeDefined || routeDescriptor.AllowedType.Equals(updateType);
                 if (!isTypePassed)
                 {
                     continue;
@@ -62,7 +63,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 // Если присутствуют вложенные маршруты, по ним проходимся тоже
                 if (routeDescriptor.isBranch)
                 {
-                    _descriptor = _Resolve(update, routeDescriptor.InnerBranch!);
+                    return _Resolve(update, routeDescriptor.InnerBranch!);
                 }
 
                 // Если были определены оба условия и они пройдены, то это более точное совпадение, нету смысла
@@ -71,6 +72,8 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 {
                     return _descriptor;
                 }
+
+                _descriptor = routeDescriptor;
             }
 
             return _descriptor;

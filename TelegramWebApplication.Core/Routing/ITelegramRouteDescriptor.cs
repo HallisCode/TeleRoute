@@ -7,7 +7,7 @@ namespace TelegramWebApplication.Core.Routing
 {
     public interface ITelegramRouteDescriptor : IEquatable<ITelegramRouteDescriptor>
     {
-        UpdateType? AllowedType { get; }
+        UpdateType AllowedType { get; }
         ITelegramFilter[]? Filters { get; }
 
         Type[]? NeededTypesForController { get; }

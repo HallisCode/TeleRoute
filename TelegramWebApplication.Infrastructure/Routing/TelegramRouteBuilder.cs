@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Telegram.Bot.Types.Enums;
 using TelegramWebApplication.Core.Routing;
 using TelegramWebApplication.Core.Routing.Filters;
 using TelegramWebApplication.Infrastructure.Routing.Attributes;
@@ -58,17 +59,14 @@ namespace TelegramWebApplication.Infrastructure.Routing
                     );
                 ITelegramFilter[] filtersAttributes = attributes.OfType<ITelegramFilter>().ToArray();
 
-                // Получаем все методы класса
-                MethodInfo[] methods = classType.GetMethods();
-                if (methods.Length <= 0)
+                // Получаем все методы класса с аттрибутом TelegramRouteAttribute
+                MethodInfo[] methodsWithAttribute = classType.GetMethods().Where(
+                    (method) => Attribute.IsDefined(method, typeof(TelegramRouteAttribute))
+                ).ToArray();
+                if (methodsWithAttribute.Length <= 0)
                 {
                     continue;
                 }
-
-                // Получаем все методы класса с аттрибутом TelegramRouteAttribute
-                MethodInfo[] methodsWithAttribute = methods.Where(
-                    (method) => Attribute.IsDefined(method, typeof(TelegramRouteAttribute))
-                ).ToArray();
 
                 // Получаем дескрипторы для всех методов, по аналогии с классом
                 List<ITelegramRouteDescriptor> methodsDescriptors = _GetRoutesFromMethods(methodsWithAttribute);
@@ -81,9 +79,9 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 if (isClassHasConditions)
                 {
                     ITelegramRouteDescriptor descriptor = TelegramRouteDescriptor.CreateBranch(
-                        descriptors,
-                        allowedTypeAttribute?.AllowedType,
-                        filtersAttributes
+                        innerBranch: methodsDescriptors,
+                        allowedType: allowedTypeAttribute?.AllowedType ?? UpdateType.Unknown,
+                        filters: filtersAttributes
                     );
 
                     descriptors.Add(descriptor);
@@ -132,7 +130,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
                 TelegramRouteDescriptor routeDescriptor = TelegramRouteDescriptor.CreateEndpoint(
                     controllerType: method.DeclaringType,
                     handler: method,
-                    allowedType: allowedTypeAttribute.AllowedType,
+                    allowedType: allowedTypeAttribute?.AllowedType ?? UpdateType.Unknown,
                     filters: filtersAttributes,
                     neededTypesForController: neededTypesForController);
 

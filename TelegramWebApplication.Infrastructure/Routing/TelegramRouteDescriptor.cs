@@ -10,7 +10,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
 {
     public class TelegramRouteDescriptor : ITelegramRouteDescriptor
     {
-        public UpdateType? AllowedType { get; protected set; }
+        public UpdateType AllowedType { get; protected set; }
         public ITelegramFilter[]? Filters { get; protected set; }
 
         public Type[]? NeededTypesForController { get; protected set; }
@@ -28,7 +28,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
             Type controllerType,
             MethodInfo handler,
             Type[] neededTypesForController,
-            UpdateType? allowedType = null,
+            UpdateType allowedType = UpdateType.Unknown,
             ITelegramFilter[]? filters = null
         )
         {
@@ -46,7 +46,7 @@ namespace TelegramWebApplication.Infrastructure.Routing
         // Добавляет ветвь
         public static TelegramRouteDescriptor CreateBranch(
             IEnumerable<ITelegramRouteDescriptor> innerBranch,
-            UpdateType? allowedType = null,
+            UpdateType allowedType = UpdateType.Unknown,
             ITelegramFilter[]? filters = null
         )
         {

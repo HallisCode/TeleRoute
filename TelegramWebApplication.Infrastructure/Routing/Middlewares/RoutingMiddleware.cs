@@ -51,14 +51,22 @@ namespace TelegramWebApplication.Infrastructure.Routing.Middlewares
                 resolvedServices.Add(service);
             }
 
-            // Порождаем контроллер и выполняем метод, заданный в качестве обработчика в дескрипторе
-            object controller = Activator.CreateInstance(telegramRouteDescriptor.ControllerType, resolvedServices)!;
-
-            Task handling = Task.Run(() =>
+            // Порождаем контроллер
+            object controller;
+            if (telegramRouteDescriptor.NeededTypesForController.Length == 0)
             {
-                telegramRouteDescriptor.ControllerType.GetMethod(telegramRouteDescriptor.Handler.Name)?
-                    .Invoke(controller, [update]);
-            });
+                controller = Activator.CreateInstance(telegramRouteDescriptor.ControllerType)!;
+            }
+            else
+            {
+                controller = constructor.Invoke(resolvedServices.ToArray());
+            }
+
+            // Запускаем обработчик 
+            Task handling = (Task)telegramRouteDescriptor.ControllerType
+                .GetMethod(telegramRouteDescriptor.Handler!.Name)?
+                .Invoke(controller, [update])!;
+
 
             await handling;
 
