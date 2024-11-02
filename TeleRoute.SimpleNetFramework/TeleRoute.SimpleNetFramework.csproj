@@ -2,6 +2,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\SimpleNetFramework\SimpleNetFramework.Infrastructure\SimpleNetFramework.Infrastructure.csproj" />
+      <ProjectReference Include="..\TeleRoute.Core\TeleRoute.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

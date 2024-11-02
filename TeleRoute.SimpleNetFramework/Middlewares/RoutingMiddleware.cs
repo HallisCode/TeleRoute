@@ -14,63 +14,20 @@ namespace TelegramWebApplication.Infrastructure.Routing.Middlewares
     /// </summary>
     public class RoutingMiddleware : IMiddleware<Update>
     {
-        private readonly IRouteTree _routeTree;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IRouteHandler _routeHandler;
 
 
         public MiddlewareDelegate<Update> Next { get; }
 
 
-        public RoutingMiddleware(IRouteTree routeTree, IServiceProvider provider)
+        public RoutingMiddleware(IRouteHandler routeHandler)
         {
-            _routeTree = routeTree;
-            _serviceProvider = provider;
+            _routeHandler = routeHandler;
         }
 
         public async Task Invoke(Update update)
         {
-            IRouteDescriptor? telegramRouteDescriptor = _routeTree.Resolve(update);
-
-            if (telegramRouteDescriptor is null) return;
-
-            ConstructorInfo constructor = telegramRouteDescriptor.ControllerType!.GetConstructors().First();
-
-            List<object> resolvedServices = new List<object>();
-            foreach (Type neededService in telegramRouteDescriptor.NeededTypesForController)
-            {
-                object? service = _serviceProvider.GetService(neededService);
-
-                if (service is null)
-                {
-                    throw new Exception(
-                        $"Unable to resolve service for type '{neededService.FullName}' " +
-                        $"while attempting to activate '{telegramRouteDescriptor.ControllerType.FullName}'."
-                    );
-                }
-
-                resolvedServices.Add(service);
-            }
-
-            // Порождаем контроллер
-            object controller;
-            if (telegramRouteDescriptor.NeededTypesForController.Length == 0)
-            {
-                controller = Activator.CreateInstance(telegramRouteDescriptor.ControllerType)!;
-            }
-            else
-            {
-                controller = constructor.Invoke(resolvedServices.ToArray());
-            }
-
-            // Запускаем обработчик 
-            Task handling = (Task)telegramRouteDescriptor.ControllerType
-                .GetMethod(telegramRouteDescriptor.Handler!.Name)?
-                .Invoke(controller, [update])!;
-
-
-            await handling;
-
-            return;
+            _routeHandler.Handle(update);
         }
     }
 }
