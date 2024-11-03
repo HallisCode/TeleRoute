@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
 using TeleRoute.Core.Routing;
 
@@ -12,15 +13,15 @@ namespace TeleRoute.Infrastructure.Routing
     {
         private readonly IRouteTree _routeTree;
         private readonly IServiceProvider _serviceProvider;
-        
+
 
         public RouteHandler(IRouteTree routeTree, IServiceProvider provider)
         {
             _routeTree = routeTree;
             _serviceProvider = provider;
         }
-        
-        
+
+
         public async Task Handle(Update update)
         {
             IRouteDescriptor? routeDescriptor = _routeTree.Resolve(update);
@@ -29,40 +30,44 @@ namespace TeleRoute.Infrastructure.Routing
 
             ConstructorInfo constructor = routeDescriptor.ControllerType!.GetConstructors().First();
 
-            // Получаем зависимости для конструтора
-            List<object> resolvedServices = new List<object>();
-            foreach (Type neededService in routeDescriptor.NeededTypesForController!)
+            // Создаём область для каждой обработки
+            await using (AsyncServiceScope serviceScope = _serviceProvider.CreateAsyncScope())
             {
-                object? service = _serviceProvider.GetService(neededService);
-
-                if (service is null)
+                // Получаем зависимости для конструтора
+                List<object> resolvedServices = new List<object>();
+                foreach (Type neededService in routeDescriptor.NeededTypesForController!)
                 {
-                    throw new Exception(
-                        $"Unable to resolve service for type '{neededService.FullName}' " +
-                        $"while attempting to activate '{routeDescriptor.ControllerType.FullName}'."
-                    );
+                    object? service = serviceScope.ServiceProvider.GetService(neededService);
+
+                    if (service is null)
+                    {
+                        throw new Exception(
+                            $"Unable to resolve service for type '{neededService.FullName}' " +
+                            $"while attempting to activate '{routeDescriptor.ControllerType.FullName}'."
+                        );
+                    }
+
+                    resolvedServices.Add(service);
                 }
 
-                resolvedServices.Add(service);
-            }
+                // Порождаем контроллер
+                object controller;
+                if (routeDescriptor.NeededTypesForController.Length == 0)
+                {
+                    controller = Activator.CreateInstance(routeDescriptor.ControllerType)!;
+                }
+                else
+                {
+                    controller = constructor.Invoke(resolvedServices.ToArray());
+                }
 
-            // Порождаем контроллер
-            object controller;
-            if (routeDescriptor.NeededTypesForController.Length == 0)
-            {
-                controller = Activator.CreateInstance(routeDescriptor.ControllerType)!;
-            }
-            else
-            {
-                controller = constructor.Invoke(resolvedServices.ToArray());
-            }
+                // Запускаем обработчик 
+                Task handling = (Task)routeDescriptor.ControllerType
+                    .GetMethod(routeDescriptor.Handler!.Name)?
+                    .Invoke(controller, [update])!;
 
-            // Запускаем обработчик 
-            Task handling = (Task)routeDescriptor.ControllerType
-                .GetMethod(routeDescriptor.Handler!.Name)?
-                .Invoke(controller, [update])!;
-            
-            await handling;
+                await handling;
+            }
         }
     }
 }
