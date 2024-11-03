@@ -36,13 +36,15 @@ namespace TeleRoute.Infrastructure.Routing
 
             foreach (IRouteDescriptor descriptor in descriptors)
             {
+                IRouteDescriptor? processedDescriptor = descriptor;
+
                 // Проверяем какие условия заданы
-                bool isAllowedTypeDefined = descriptor.AllowedType is not UpdateType.Unknown;
-                bool isFilterDefined = descriptor.Filters.Length > 0;
+                bool isAllowedTypeDefined = processedDescriptor.AllowedType is not UpdateType.Unknown;
+                bool isFilterDefined = processedDescriptor.Filters.Length > 0;
 
                 // Определяем соответствует ли update заданному типу
                 // Если type is 'Unknown' -> разрешены все типы
-                bool isTypePassed = !isAllowedTypeDefined || descriptor.AllowedType.Equals(updateType);
+                bool isTypePassed = !isAllowedTypeDefined || processedDescriptor.AllowedType.Equals(updateType);
                 if (!isTypePassed)
                 {
                     continue;
@@ -52,20 +54,21 @@ namespace TeleRoute.Infrastructure.Routing
                 int countPassedFilters = 0;
                 if (isFilterDefined)
                 {
-                    countPassedFilters = descriptor.Filters.Count(filter =>
+                    countPassedFilters = processedDescriptor.Filters.Count(filter =>
                         filter.IsMatch(update) && filter.IsTypeAllowed(updateType)
                     );
                 }
 
-                // Если присутствуют вложенные маршруты, по ним проходимся тоже
-                if (descriptor.isBranch)
+                // Если присутствуют вложенные маршруты, по ним проходимся тоже,
+                // тем самым получим вложенный маршрут с наилучшим совпадением
+                if (processedDescriptor.isBranch)
                 {
-                    return _Resolve(update, descriptor.InnerBranch!);
+                    processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
                 }
 
                 if (isTypePassed && countPassedFilters > maxPassedFiltersCount)
                 {
-                    _descriptor = descriptor;
+                    _descriptor = processedDescriptor;
                 }
             }
 
