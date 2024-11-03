@@ -51,6 +51,7 @@ namespace TeleRoute.Infrastructure.Routing
                 }
 
                 // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
+                bool isFiltersPassed = true;
                 int countPassedFilters = 0;
                 if (isFilterDefined)
                 {
@@ -59,15 +60,17 @@ namespace TeleRoute.Infrastructure.Routing
                     );
                 }
 
+                isFiltersPassed = processedDescriptor.Filters.Length == countPassedFilters;
+
                 // Если присутствуют вложенные маршруты, по ним проходимся тоже,
                 // тем самым получим вложенный маршрут с наилучшим совпадением
                 if (processedDescriptor.isBranch)
                 {
                     processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
                 }
-                
+
                 // Если 2 маршрута с одинаковым количеством пройденных фильтров, берётся последний
-                if (isTypePassed && countPassedFilters >= maxPassedFiltersCount)
+                if (isTypePassed && isFiltersPassed && countPassedFilters >= maxPassedFiltersCount)
                 {
                     _descriptor = processedDescriptor;
 
