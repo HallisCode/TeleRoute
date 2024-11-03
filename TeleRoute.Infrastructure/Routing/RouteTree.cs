@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing;
-using TeleRoute.Core.Routing.Filters;
 
 namespace TeleRoute.Infrastructure.Routing
 {
@@ -33,51 +31,41 @@ namespace TeleRoute.Infrastructure.Routing
             UpdateType updateType = update.Type;
             IRouteDescriptor? _descriptor = null;
 
-            TakeDescriptorLoop:
-            foreach (IRouteDescriptor routeDescriptor in descriptors)
+            // Сохраняем количество пройденных фильтров дескриптором, чтобы найти наилучшее совпадение
+            int maxPassedFiltersCount = 0;
+
+            foreach (IRouteDescriptor descriptor in descriptors)
             {
                 // Проверяем какие условия заданы
-                bool isAllowedTypeDefined = routeDescriptor.AllowedType is not UpdateType.Unknown;
-                bool isFilterDefined = routeDescriptor.Filters.Length > 0;
+                bool isAllowedTypeDefined = descriptor.AllowedType is not UpdateType.Unknown;
+                bool isFilterDefined = descriptor.Filters.Length > 0;
 
                 // Определяем соответствует ли update заданному типу
                 // Если type is 'Unknown' -> разрешены все типы
-                bool isTypePassed = !isAllowedTypeDefined || routeDescriptor.AllowedType.Equals(updateType);
+                bool isTypePassed = !isAllowedTypeDefined || descriptor.AllowedType.Equals(updateType);
                 if (!isTypePassed)
                 {
                     continue;
                 }
 
                 // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
-                bool isFiltersPassed = true;
+                int countPassedFilters = 0;
                 if (isFilterDefined)
                 {
-                    isFiltersPassed = routeDescriptor.Filters.All(filter =>
+                    countPassedFilters = descriptor.Filters.Count(filter =>
                         filter.IsMatch(update) && filter.IsTypeAllowed(updateType)
                     );
-
-                    if (!isFiltersPassed)
-                    {
-                        continue;
-                    }
                 }
 
                 // Если присутствуют вложенные маршруты, по ним проходимся тоже
-                if (routeDescriptor.isBranch)
+                if (descriptor.isBranch)
                 {
-                    return _Resolve(update, routeDescriptor.InnerBranch!);
+                    return _Resolve(update, descriptor.InnerBranch!);
                 }
 
-                // Если были определены оба условия и они пройдены, то это более точное совпадение, нету смысла
-                // дальше искать маршрут. Иначе продолжаем искать до более точного совпадения
-                if (isAllowedTypeDefined && isFilterDefined)
+                if (isTypePassed && countPassedFilters > maxPassedFiltersCount)
                 {
-                    return _descriptor;
-                }
-
-                if (isTypePassed || isFiltersPassed)
-                {
-                    _descriptor = routeDescriptor;
+                    _descriptor = descriptor;
                 }
             }
 
