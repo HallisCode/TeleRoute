@@ -65,8 +65,9 @@ namespace TeleRoute.Infrastructure.Routing
                 {
                     processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
                 }
-
-                if (isTypePassed && countPassedFilters > maxPassedFiltersCount)
+                
+                // Если 2 маршрута с одинаковым количеством пройденных фильтров, берётся последний
+                if (isTypePassed && countPassedFilters >= maxPassedFiltersCount)
                 {
                     _descriptor = processedDescriptor;
 
