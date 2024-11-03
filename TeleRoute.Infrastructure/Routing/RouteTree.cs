@@ -69,6 +69,8 @@ namespace TeleRoute.Infrastructure.Routing
                 if (isTypePassed && countPassedFilters > maxPassedFiltersCount)
                 {
                     _descriptor = processedDescriptor;
+
+                    maxPassedFiltersCount = countPassedFilters;
                 }
             }
 
