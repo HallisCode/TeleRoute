@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing;
+using TeleRoute.Core.Routing.Filters;
 
 namespace TeleRoute.Infrastructure.Routing
 {
@@ -10,20 +13,26 @@ namespace TeleRoute.Infrastructure.Routing
     {
         public IReadOnlyCollection<IRouteDescriptor> Routings { get; private set; }
 
+        private readonly ITelegramBotClient _telegramBot;
 
-        public RouteTree(IEnumerable<IRouteDescriptor> routings)
+
+        public RouteTree(
+            IEnumerable<IRouteDescriptor> routings,
+            ITelegramBotClient telegramBot
+        )
         {
             Routings = routings.ToArray();
+            _telegramBot = telegramBot;
         }
 
-        public IRouteDescriptor? Resolve(Update update)
+        public Task<IRouteDescriptor>? Resolve(Update update)
         {
             return _Resolve(update, Routings);
         }
 
 
         // Ищем конечный дескриптор на основе прохода древа
-        private IRouteDescriptor? _Resolve(
+        private async Task<IRouteDescriptor>? _Resolve(
             Update update,
             IEnumerable<IRouteDescriptor> descriptors
         )
@@ -55,9 +64,13 @@ namespace TeleRoute.Infrastructure.Routing
                 int countPassedFilters = 0;
                 if (isFilterDefined)
                 {
-                    countPassedFilters = processedDescriptor.Filters.Count(filter =>
-                        filter.IsMatch(update) && filter.IsTypeAllowed(updateType)
-                    );
+                    FilterContext filterContext = new FilterContext(update, _telegramBot);
+
+                    countPassedFilters = (await Task.WhenAll(
+                        processedDescriptor.Filters.Select(async (filter) =>
+                            await filter.IsMatch(filterContext) && filter.IsTypeAllowed(updateType)
+                        )
+                    )).Count(result => result is true);
                 }
 
                 isFiltersPassed = processedDescriptor.Filters.Length == countPassedFilters;
@@ -66,7 +79,7 @@ namespace TeleRoute.Infrastructure.Routing
                 // тем самым получим вложенный маршрут с наилучшим совпадением
                 if (processedDescriptor.isBranch)
                 {
-                    processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
+                    processedDescriptor = await _Resolve(update, processedDescriptor.InnerBranch!);
                 }
 
                 // Если 2 маршрута с одинаковым количеством пройденных фильтров, берётся последний

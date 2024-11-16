@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing;
 using TeleRoute.Core.Routing.Filters;
@@ -13,8 +14,11 @@ namespace TeleRoute.Infrastructure.Routing
     {
         private List<IRouteDescriptor> _routes = new List<IRouteDescriptor>();
 
-        public RouteBuilder()
+        private ITelegramBotClient _telegramBot;
+
+        public RouteBuilder(ITelegramBotClient telegramBot)
         {
+            _telegramBot = telegramBot;
         }
 
         public IRouteBuilder AddFromAssembly(Assembly assembly)
@@ -34,7 +38,7 @@ namespace TeleRoute.Infrastructure.Routing
         public IRouteTree Build()
         {
             _VerifyUnduplicated(_routes);
-            IRouteTree routeTree = new RouteTree(_routes);
+            IRouteTree routeTree = new RouteTree(_routes, _telegramBot);
 
             _routes.Clear();
             return routeTree;

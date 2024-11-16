@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -6,7 +7,7 @@ namespace TeleRoute.Core.Routing.Filters
     public interface IFilter
     {
         UpdateType? AllowedType { get; }
-        bool IsMatch(Update update);
+        Task<bool> IsMatch(FilterContext filterContext);
         bool IsTypeAllowed(UpdateType type);
     }
 }

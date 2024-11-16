@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TeleRoute.Core.Routing
@@ -7,6 +9,6 @@ namespace TeleRoute.Core.Routing
     {
         IReadOnlyCollection<IRouteDescriptor> Routings { get; }
 
-        IRouteDescriptor? Resolve(Update update);
+        Task<IRouteDescriptor>? Resolve(Update update);
     }
 }

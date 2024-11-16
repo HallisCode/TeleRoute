@@ -6,21 +6,14 @@ using TeleRoute.Core.Routing.Filters;
 
 namespace TeleRoute.Infrastructure.Routing.Filters
 {
-    public class IsCommandFilterAttribute : Attribute, IFilter
+    public class GroupChatFilterAttribute : Attribute, IFilter
     {
-        private readonly string _command = "";
-
-        public UpdateType? AllowedType { get; } = UpdateType.Message;
-
-        
-        public IsCommandFilterAttribute(string command = "")
-        {
-            _command = command;
-        }
+        public UpdateType? AllowedType { get; }
 
         public Task<bool> IsMatch(FilterContext filterContext)
         {
-            if (filterContext.Update.Message.Text.StartsWith('/' + _command))
+            if (filterContext.Update.Message.Chat.Type == ChatType.Group ||
+                filterContext.Update.Message.Chat.Type == ChatType.Supergroup)
             {
                 return Task.FromResult<bool>(true);
             }
