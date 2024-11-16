@@ -24,7 +24,7 @@ namespace TeleRoute.Infrastructure.Routing
 
         public async Task Handle(Update update)
         {
-            IRouteDescriptor? routeDescriptor = await _routeTree.Resolve(update);
+            IRouteDescriptor? routeDescriptor = _routeTree.Resolve(update);
 
             if (routeDescriptor is null) return;
 

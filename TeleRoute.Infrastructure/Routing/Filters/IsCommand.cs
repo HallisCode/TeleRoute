@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing.Filters;
@@ -18,14 +17,14 @@ namespace TeleRoute.Infrastructure.Routing.Filters
             _command = command;
         }
 
-        public Task<bool> IsMatch(FilterContext filterContext)
+        public bool IsMatch(Update update)
         {
-            if (filterContext.Update.Message.Text.StartsWith('/' + _command))
+            if (update.Message.Text.StartsWith('/' + _command))
             {
-                return Task.FromResult<bool>(true);
+                return true;
             }
 
-            return Task.FromResult<bool>(false);
+            return false;
         }
 
         public bool IsTypeAllowed(UpdateType type)

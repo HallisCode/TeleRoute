@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing.Filters;
@@ -10,14 +9,9 @@ namespace TeleRoute.Infrastructure.Routing.Filters
     {
         public UpdateType? AllowedType { get; } = UpdateType.Message;
 
-        public Task<bool> IsMatch(FilterContext filterContext)
+        public bool IsMatch(Update update)
         {
-            if (filterContext.Update.Message.Chat.Type == ChatType.Private)
-            {
-                return Task.FromResult<bool>(true);
-            }
-
-            return Task.FromResult<bool>(false);
+            return update.Message.Chat.Type == ChatType.Private;
         }
 
         public bool IsTypeAllowed(UpdateType type)

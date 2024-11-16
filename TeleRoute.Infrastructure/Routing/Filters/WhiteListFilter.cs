@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing.Filters;
@@ -19,14 +18,14 @@ namespace TeleRoute.Infrastructure.Routing.Filters
             _listUserId = listUserId;
         }
 
-        public Task<bool> IsMatch(FilterContext filterContext)
+        public bool IsMatch(Update update)
         {
-            if (_listUserId.Contains(filterContext.Update.Message.From.Id))
+            if (_listUserId.Contains(update.Message.From.Id))
             {
-                return Task.FromResult<bool>(true);
+                return true;
             }
 
-            return Task.FromResult<bool>(false);
+            return false;
         }
 
         public bool IsTypeAllowed(UpdateType type)
