@@ -19,14 +19,14 @@ namespace TeleRoute.Infrastructure.Routing.Filters
             _listUserId = listUserId;
         }
 
-        public Task<bool> IsMatchAsync(Update update)
+        public bool IsMatch(Update update)
         {
             if (_listUserId.Contains(update.Message.From.Id))
             {
-                return Task.FromResult<bool>(true);
+                return true;
             }
 
-            return Task.FromResult<bool>(false);
+            return false;
         }
 
         public bool IsTypeAllowed(UpdateType type)

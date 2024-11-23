@@ -12,20 +12,20 @@ namespace TeleRoute.Infrastructure.Routing.Filters
 
         public UpdateType? AllowedType { get; } = UpdateType.Message;
 
-        
+
         public IsCommandFilterAttribute(string command = "")
         {
             _command = command;
         }
 
-        public Task<bool> IsMatchAsync(Update update)
+        public bool IsMatch(Update update)
         {
             if (update.Message.Text.StartsWith('/' + _command))
             {
-                return Task.FromResult<bool>(true);
+                return true;
             }
 
-            return Task.FromResult<bool>(false);
+            return false;
         }
 
         public bool IsTypeAllowed(UpdateType type)

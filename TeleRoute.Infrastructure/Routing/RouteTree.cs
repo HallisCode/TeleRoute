@@ -18,14 +18,14 @@ namespace TeleRoute.Infrastructure.Routing
             Routings = routings.ToArray();
         }
 
-        public async Task<IRouteDescriptor?> Resolve(Update update)
+        public IRouteDescriptor? Resolve(Update update)
         {
-            return await _Resolve(update, Routings);
+            return _Resolve(update, Routings);
         }
 
 
         // Ищем конечный дескриптор на основе прохода древа
-        private async Task<IRouteDescriptor?> _Resolve(
+        private IRouteDescriptor? _Resolve(
             Update update,
             IEnumerable<IRouteDescriptor> descriptors
         )
@@ -58,7 +58,7 @@ namespace TeleRoute.Infrastructure.Routing
                 {
                     foreach (IFilter filter in processedDescriptor.Filters)
                     {
-                        bool isFilterPassed = await filter.IsMatchAsync(update);
+                        bool isFilterPassed = filter.IsMatch(update);
                         bool isFilterTypePassed = filter.IsTypeAllowed(updateType);
 
                         if (isFilterPassed && isFilterTypePassed)
@@ -76,7 +76,7 @@ namespace TeleRoute.Infrastructure.Routing
                 // тем самым получим вложенный маршрут с наилучшим совпадением.
                 if (processedDescriptor.isBranch)
                 {
-                    processedDescriptor = await _Resolve(update, processedDescriptor.InnerBranch!);
+                    processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
                 }
 
                 // Если 2 маршрута с одинаковым количеством пройденных фильтров, берётся последний

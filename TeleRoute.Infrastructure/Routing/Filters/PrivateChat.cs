@@ -10,9 +10,9 @@ namespace TeleRoute.Infrastructure.Routing.Filters
     {
         public UpdateType? AllowedType { get; } = UpdateType.Message;
 
-        public Task<bool> IsMatchAsync(Update update)
+        public bool IsMatch(Update update)
         {
-            return Task.FromResult<bool>(update.Message.Chat.Type == ChatType.Private);
+            return update.Message.Chat.Type == ChatType.Private;
         }
 
         public bool IsTypeAllowed(UpdateType type)

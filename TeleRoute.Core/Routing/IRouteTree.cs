@@ -11,6 +11,6 @@ namespace TeleRoute.Core.Routing
     {
         IReadOnlyCollection<IRouteDescriptor> Routings { get; }
 
-        Task<IRouteDescriptor?> Resolve(Update update);
+        IRouteDescriptor? Resolve(Update update);
     }
 }

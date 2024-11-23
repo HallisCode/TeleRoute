@@ -21,7 +21,7 @@ namespace TeleRoute.Core.Routing.Filters
         /// </summary>
         /// <param name="update"></param>
         /// <returns></returns>
-        Task<bool> IsMatchAsync(Update update);
+        bool IsMatch(Update update);
         
         /// <summary>
         /// Проверяет, может ли данный фильтр обработать переданный тип.
