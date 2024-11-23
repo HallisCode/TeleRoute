@@ -3,6 +3,9 @@ using Telegram.Bot.Types;
 
 namespace TeleRoute.Core.Routing
 {
+    /// <summary>
+    /// Описывает работу маршрутизатора.
+    /// </summary>
     public interface IRouteHandler
     {
         /// <summary>

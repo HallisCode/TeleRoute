@@ -74,7 +74,9 @@ namespace TeleRoute.Infrastructure.Routing
                 // Проверяем какие условия заданы у класса
                 bool isAllowedTypeDefined = allowedTypeAttribute is not null;
                 bool isFilterDefined = filtersAttributes.Length > 0;
-
+                
+                // Если у класса-контроллера присутсвуют ограничения => создаём вложенную ветку с маршрутами,
+                // иначе добавляем все endpoints.
                 bool isClassHasConditions = isAllowedTypeDefined || isFilterDefined;
                 if (isClassHasConditions)
                 {
@@ -85,22 +87,30 @@ namespace TeleRoute.Infrastructure.Routing
                     );
 
                     descriptors.Add(descriptor);
-                    continue;
                 }
-
-                descriptors.AddRange(methodsDescriptors);
+                else
+                {
+                    descriptors.AddRange(methodsDescriptors);
+                }
             }
 
             _VerifyUnduplicated(descriptors);
             _routes.AddRange(descriptors);
         }
 
+        /// <summary>
+        /// Получает endpoints на основе переданных методов.
+        /// </summary>
+        /// <param name="methods"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         private List<IRouteDescriptor> _GetRoutesFromMethods(IEnumerable<MethodInfo> methods)
         {
             List<IRouteDescriptor> descriptors = new List<IRouteDescriptor>();
 
             foreach (MethodInfo method in methods)
             {
+                // Проверяем сигнатуру метода
                 _VerifyMatchTelegramEndpointDelegate(method);
 
                 TeleRouteAttribute? methodRouteAttribute = (TeleRouteAttribute?)
@@ -115,18 +125,22 @@ namespace TeleRoute.Infrastructure.Routing
 
                 object[] attributes = method.GetCustomAttributes(false);
 
+                // Получаем аттрибут AllowedUpdateType навешанный на метод
                 AllowedUpdateTypeAttribute? allowedTypeAttribute = (AllowedUpdateTypeAttribute?)
                     Attribute.GetCustomAttribute(
                         method, typeof(AllowedUpdateTypeAttribute)
                     );
+                
+                // Получаем фильтры навешанные на метод
                 IFilter[] filtersAttributes = attributes.OfType<IFilter>().ToArray();
 
-
+                // Получаем массив необходимых зависимостей для контроллера
                 Type[] neededTypesForController = method.DeclaringType!
                     .GetConstructors().First()
                     .GetParameters()
                     .Select((ParameterInfo parameter) => parameter.ParameterType).ToArray();
-
+                
+                // Создаём ednpoint
                 RouteDescriptor routeDescriptor = RouteDescriptor.CreateEndpoint(
                     controllerType: method.DeclaringType,
                     handler: method,
@@ -136,11 +150,16 @@ namespace TeleRoute.Infrastructure.Routing
 
                 descriptors.Add(routeDescriptor);
             }
-
+            
             _VerifyUnduplicated(descriptors);
             return descriptors;
         }
 
+        /// <summary>
+        /// Проверяет, чтобы метод соответствовал сигнатуре <see cref="EndpointDelegate"/>.
+        /// </summary>
+        /// <param name="method"></param>
+        /// <exception cref="Exception"></exception>
         private void _VerifyMatchTelegramEndpointDelegate(MethodInfo method)
         {
             Type telegramEndpointDelegate = typeof(EndpointDelegate);
@@ -149,6 +168,7 @@ namespace TeleRoute.Infrastructure.Routing
             ParameterInfo[] telegramEndpointParams = method.GetParameters();
             ParameterInfo[] methodParams = method.GetParameters();
 
+            // Проверяем возвращаемый тип
             if (method.ReturnType != telegramEndpointMethod.ReturnType)
             {
                 goto ThrowException;
@@ -176,6 +196,11 @@ namespace TeleRoute.Infrastructure.Routing
             );
         }
 
+        /// <summary>
+        /// Проверяет на присутствие равноценных маршрутов.
+        /// </summary>
+        /// <param name="descriptors"></param>
+        /// <exception cref="Exception"></exception>
         private void _VerifyUnduplicated(IEnumerable<IRouteDescriptor> descriptors)
         {
             if (descriptors.Count() != new HashSet<IRouteDescriptor>(descriptors).Count)

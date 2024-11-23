@@ -5,6 +5,9 @@ using TeleRoute.Core.Routing.Filters;
 
 namespace TeleRoute.Core.Routing
 {
+    /// <summary>
+    /// Описывает конечную точку маршрута.
+    /// </summary>
     public interface IRouteDescriptor : IEquatable<IRouteDescriptor>
     {
         UpdateType AllowedType { get; }

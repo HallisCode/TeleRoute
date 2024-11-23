@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeleRoute.Core.Routing;
+using TeleRoute.Core.Routing.Filters;
 
 namespace TeleRoute.Infrastructure.Routing
 {
@@ -16,14 +18,14 @@ namespace TeleRoute.Infrastructure.Routing
             Routings = routings.ToArray();
         }
 
-        public IRouteDescriptor? Resolve(Update update)
+        public async Task<IRouteDescriptor?> Resolve(Update update)
         {
-            return _Resolve(update, Routings);
+            return await _Resolve(update, Routings);
         }
 
 
         // Ищем конечный дескриптор на основе прохода древа
-        private IRouteDescriptor? _Resolve(
+        private async Task<IRouteDescriptor?> _Resolve(
             Update update,
             IEnumerable<IRouteDescriptor> descriptors
         )
@@ -49,24 +51,32 @@ namespace TeleRoute.Infrastructure.Routing
                 {
                     continue;
                 }
-
-                // Определяем соответствует ли update фильтрам, если нет, пропускаем этот дескриптор
-                bool isFiltersPassed = true;
+                
+                // Считаем, сколько фильтров endpoint'a прошёл update.
                 int countPassedFilters = 0;
                 if (isFilterDefined)
                 {
-                    countPassedFilters = processedDescriptor.Filters.Count(filter =>
-                        filter.IsMatch(update) && filter.IsTypeAllowed(updateType)
-                    );
-                }
+                    foreach (IFilter filter in processedDescriptor.Filters)
+                    {
+                        bool isFilterPassed = await filter.IsMatchAsync(update);
+                        bool isFilterTypePassed = filter.IsTypeAllowed(updateType);
 
+                        if (isFilterPassed && isFilterTypePassed)
+                        {
+                            countPassedFilters++;
+                        }
+                    }
+                }
+                
+                // Определяем, прошёл ли update все фильтры endpoint'a.
+                bool isFiltersPassed = true;
                 isFiltersPassed = processedDescriptor.Filters.Length == countPassedFilters;
 
                 // Если присутствуют вложенные маршруты, по ним проходимся тоже,
-                // тем самым получим вложенный маршрут с наилучшим совпадением
+                // тем самым получим вложенный маршрут с наилучшим совпадением.
                 if (processedDescriptor.isBranch)
                 {
-                    processedDescriptor = _Resolve(update, processedDescriptor.InnerBranch!);
+                    processedDescriptor = await _Resolve(update, processedDescriptor.InnerBranch!);
                 }
 
                 // Если 2 маршрута с одинаковым количеством пройденных фильтров, берётся последний
